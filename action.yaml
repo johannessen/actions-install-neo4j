@@ -1,0 +1,86 @@
+name: 'Install Neo4j'
+description: 'Install a fresh Neo4j server locally and start it'
+inputs:
+  neo4j-version:
+    description: 'Neo4j version to install'
+    default: '4.4.23'
+  password:
+    description: 'Neo4j password'
+    required: true
+  neo4j-dist-url:
+    description: 'Base URL for downloading Neo4j distributions'
+    default: 'https://dist.neo4j.org'
+runs:
+  using: "composite"
+  steps:
+
+    - name: Tarball cache
+      uses: actions/cache@v3
+      with:
+        key: neo4j-${{ inputs.neo4j-version }}-${{ runner.os }}
+        path: |
+          neo4j-community-*-unix.tar.gz
+          OpenJDK*.tar.gz
+
+    - name: Install Neo4j 5
+      if: ${{ startsWith( inputs.neo4j-version , '5.') }}
+      run: |
+        NEO4J_DISTS="${{ inputs.neo4j-dist-url }}"
+        NEO4J="${{ inputs.neo4j-version }}"
+        [ -e "neo4j-community-$NEO4J-unix.tar.gz" ] && CACHE_HIT=1
+        [ -n "$CACHE_HIT" ] || curl -sLO https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.8%2B7/OpenJDK17U-jre_x64_linux_hotspot_17.0.8_7.tar.gz
+        tar -xzf OpenJDK17U-jre_x64_linux_hotspot_17.0.8_7.tar.gz
+        export JAVA_HOME="$(pwd)/jdk-17.0.8+7-jre"
+        echo "$JAVA_HOME" > neo4j-javahome
+        eval "${JAVA_HOME:-/usr}/bin/java -version"
+        [ -n "$CACHE_HIT" ] || curl -sLO $NEO4J_DISTS/neo4j-community-$NEO4J-unix.tar.gz
+        tar -xzf neo4j-community-$NEO4J-unix.tar.gz
+        neo4j-community-$NEO4J/bin/neo4j-admin dbms set-initial-password "$TEST_NEO4J_PASSWORD" || echo "Password change using neo4j-admin failed."
+        neo4j-community-$NEO4J/bin/neo4j start
+        perl -E "print'Waiting for server to be ready ...';for(0..60){last if 0+\`grep Started neo4j-community-$NEO4J/logs/neo4j.log > /dev/null 2>&1 && echo 1 || echo 0\`;print'.';sleep 1}say' OK.'"
+        cat neo4j-community-$NEO4J/logs/neo4j.log
+        neo4j-community-$NEO4J/bin/neo4j status
+      shell: bash
+
+    - name: Install Neo4j 4
+      if: ${{ startsWith( inputs.neo4j-version , '4.') }}
+      run: |
+        NEO4J_DISTS="${{ inputs.neo4j-dist-url }}"
+        NEO4J="${{ inputs.neo4j-version }}"
+        [ -e "neo4j-community-$NEO4J-unix.tar.gz" ] && CACHE_HIT=1
+        [ -n "$CACHE_HIT" ] || curl -sLO https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.20%2B8/OpenJDK11U-jre_x64_linux_hotspot_11.0.20_8.tar.gz
+        tar -xzf OpenJDK11U-jre_x64_linux_hotspot_11.0.20_8.tar.gz
+        export JAVA_HOME="$(pwd)/jdk-11.0.20+8-jre"
+        echo "$JAVA_HOME" > neo4j-javahome
+        eval "${JAVA_HOME:-/usr}/bin/java -version"
+        [ -n "$CACHE_HIT" ] || curl -sLO $NEO4J_DISTS/neo4j-community-$NEO4J-unix.tar.gz
+        tar -xzf neo4j-community-$NEO4J-unix.tar.gz
+        neo4j-community-$NEO4J/bin/neo4j-admin set-initial-password "$TEST_NEO4J_PASSWORD" || echo "Password change using neo4j-admin failed."
+        neo4j-community-$NEO4J/bin/neo4j start
+        perl -E "print'Waiting for server to be ready ...';for(0..60){last if 0+\`grep Started neo4j-community-$NEO4J/logs/neo4j.log > /dev/null 2>&1 && echo 1 || echo 0\`;print'.';sleep 1}say' OK.'"
+        cat neo4j-community-$NEO4J/logs/neo4j.log
+        neo4j-community-$NEO4J/bin/neo4j status
+      shell: bash
+
+    - name: Install Neo4j 2/3
+      if: ${{ startsWith( inputs.neo4j-version , '3.') || startsWith( inputs.neo4j-version , '2.') }}
+      run: |
+        NEO4J_DISTS="${{ inputs.neo4j-dist-url }}"
+        NEO4J="${{ inputs.neo4j-version }}"
+        [ -e "neo4j-community-$NEO4J-unix.tar.gz" ] && CACHE_HIT=1
+        [ -n "$CACHE_HIT" ] || curl -sLO https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u382-b05/OpenJDK8U-jre_x64_linux_hotspot_8u382b05.tar.gz
+        tar -xzf OpenJDK8U-jre_x64_linux_hotspot_8u382b05.tar.gz
+        export JAVA_HOME="$(pwd)/jdk8u382-b05-jre"
+        echo "$JAVA_HOME" > neo4j-javahome
+        eval "${JAVA_HOME:-/usr}/bin/java -version"
+        [ -n "$CACHE_HIT" ] || curl -sLO $NEO4J_DISTS/neo4j-community-$NEO4J-unix.tar.gz
+        tar -xzf neo4j-community-$NEO4J-unix.tar.gz
+        neo4j-community-$NEO4J/bin/neo4j-admin set-initial-password "$TEST_NEO4J_PASSWORD" || echo "Password change using neo4j-admin failed. (This is expected on Neo4j 2.)"
+        NEO4J_LOG=logs/neo4j.log
+        if [ "$NEO4J" = "2.3.12" ] ; then neo4j-community-$NEO4J/bin/neo4j start-no-wait ; NEO4J_LOG=data/log/console.log ; else neo4j-community-$NEO4J/bin/neo4j start ; fi
+        perl -E "print'Waiting for server to be ready ...';for(0..60){last if 0+\`grep 'Started\\\|interface ready' neo4j-community-$NEO4J/$NEO4J_LOG > /dev/null 2>&1 && echo 1 || echo 0\`;print'.';sleep 1}say' OK.'"
+        sleep 1
+        curl -u neo4j:neo4j -fid "{\"password\":\"$TEST_NEO4J_PASSWORD\"}" -H "Content-Type:application/json" -s http://localhost:7474/user/neo4j/password || echo "Password change using cURL failed. (This is expected on Neo4j 3.)"
+        cat neo4j-community-$NEO4J/$NEO4J_LOG
+        neo4j-community-$NEO4J/bin/neo4j status
+      shell: bash

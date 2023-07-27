@@ -1,0 +1,50 @@
+name: Tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "*"
+  pull_request:
+    branches:
+      - "*"
+
+jobs:
+  test-job:
+    runs-on: ubuntu-latest
+    name: "Neo4j ${{ matrix.neo4j }}"
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - neo4j: "5.10.0"
+          - neo4j: "4.4.23"
+          - neo4j: "3.5.35"
+          - neo4j: "2.3.12"
+    env:
+      TEST_NEO4J_PASSWORD: xkcd_792
+      NEO4J: ${{ matrix.neo4j }}
+    steps:
+      
+      - name: Install Neo4j
+        uses: johannessen/actions-install-neo4j@main
+        with:
+          neo4j-version: ${{ matrix.neo4j }}
+          password: ${{ env.TEST_NEO4J_PASSWORD }}
+      
+      - name: Version info
+        run: |
+          curl -s http://localhost:7474/ -u "neo4j:$TEST_NEO4J_PASSWORD" | grep neo4j_version || true
+          curl -s http://localhost:7474/db/data/ -u "neo4j:$TEST_NEO4J_PASSWORD" | grep neo4j_version || true
+          ls | grep --max-count=1 neo4j-community || true
+          basename "$(cat neo4j-javahome)"
+      
+      - name: Install driver
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: 5.38
+          install-modules: Neo4j::Driver
+      
+      - name: Test Neo4j connection
+        run: |
+          perl -MNeo4j::Driver -e "print Neo4j::Driver->new->basic_auth(neo4j=>'$TEST_NEO4J_PASSWORD')->session->run(\"RETURN 'Connected to Neo4j\\n'\")->single->get;"
