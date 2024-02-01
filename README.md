@@ -56,9 +56,9 @@ Java is installed in one of the following directories, depending
 on the Neo4j version. The full path is written to a file named
 `neo4j-javahome`, for convenience.
 
-* `jdk8u382-b05-jre` for Neo4j 2/3
-* `jdk-11.0.20+8-jre` for Neo4j 4
-* `jdk-17.0.8+7-jre` for Neo4j 5
+* `jdk8u392-b08-jre` for Neo4j 2/3
+* `jdk-11.0.22+7-jre` for Neo4j 4
+* `jdk-17.0.9+9-jre` for Neo4j 5
 
 ## Limitations
 
