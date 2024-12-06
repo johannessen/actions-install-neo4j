@@ -3,13 +3,17 @@ description: 'Install a fresh Neo4j server locally and start it'
 inputs:
   neo4j-version:
     description: 'Neo4j version to install'
-    default: '4.4.30'
+    default: '4.4'
   password:
     description: 'Neo4j password'
     required: true
   neo4j-dist-url:
     description: 'Base URL for downloading Neo4j distributions'
     default: 'https://dist.neo4j.org'
+outputs:
+  neo4j-version:
+    description: 'Neo4j version actually installed'
+    value: ${{ steps.aliases.outputs.neo4j-version }}
 runs:
   using: "composite"
   steps:
@@ -22,11 +26,82 @@ runs:
           neo4j-community-*-unix.tar.gz
           OpenJDK*.tar.gz
 
+    - name: Resolve Neo4j version
+      run: |
+        ALIAS="${{ inputs.neo4j-version }}"
+        case "$ALIAS" in
+          1  ) NEO4J=1.9     ;;
+          2  ) NEO4J=2.3     ;;
+          3  ) NEO4J=3.5     ;;
+          4  ) NEO4J=4.4     ;;
+          5  ) NEO4J=5.26    ;;
+          *  ) NEO4J=$ALIAS  ;;
+        esac
+        if [ "$NEO4J" != "$ALIAS" ] ; then
+          echo "Resolved Neo4j '$ALIAS' to Neo4j '$NEO4J'."
+        fi
+        ALIAS="$NEO4J"
+        case "$ALIAS" in
+          1.9   ) NEO4J=1.9.9   ;;
+          2.0   ) NEO4J=2.0.5   ;;
+          2.1   ) NEO4J=2.1.8   ;;
+          2.2   ) NEO4J=2.2.10  ;;
+          2.3   ) NEO4J=2.3.12  ;;
+          3.0   ) NEO4J=3.0.12  ;;
+          3.1   ) NEO4J=3.1.9   ;;
+          3.2   ) NEO4J=3.2.14  ;;
+          3.3   ) NEO4J=3.3.9   ;;
+          3.4   ) NEO4J=3.4.18  ;;
+          3.5   ) NEO4J=3.5.35  ;;
+          4.0   ) NEO4J=4.0.12  ;;
+          4.1   ) NEO4J=4.1.13  ;;
+          4.2   ) NEO4J=4.2.19  ;;
+          4.3   ) NEO4J=4.3.24  ;;
+          4.4   ) NEO4J=4.4.39  ;;
+          5.0   ) NEO4J=5.1.0   ;;
+          5.1   ) NEO4J=5.1.0   ;;
+          5.2   ) NEO4J=5.2.0   ;;
+          5.3   ) NEO4J=5.3.0   ;;
+          5.4   ) NEO4J=5.4.0   ;;
+          5.5   ) NEO4J=5.5.0   ;;
+          5.6   ) NEO4J=5.6.0   ;;
+          5.7   ) NEO4J=5.7.0   ;;
+          5.8   ) NEO4J=5.8.0   ;;
+          5.9   ) NEO4J=5.9.0   ;;
+          5.10  ) NEO4J=5.10.0  ;;
+          5.11  ) NEO4J=5.11.0  ;;
+          5.12  ) NEO4J=5.12.0  ;;
+          5.13  ) NEO4J=5.13.0  ;;
+          5.14  ) NEO4J=5.14.0  ;;
+          5.15  ) NEO4J=5.15.0  ;;
+          5.16  ) NEO4J=5.16.0  ;;
+          5.17  ) NEO4J=5.17.0  ;;
+          5.18  ) NEO4J=5.18.1  ;;
+          5.19  ) NEO4J=5.19.0  ;;
+          5.20  ) NEO4J=5.20.0  ;;
+          5.21  ) NEO4J=5.21.0  ;;
+          5.22  ) NEO4J=5.22.0  ;;
+          5.23  ) NEO4J=5.23.0  ;;
+          5.24  ) NEO4J=5.24.2  ;;
+          5.25  ) NEO4J=5.25.1  ;;
+          *     ) NEO4J=$NEO4J  ;;
+        esac
+        if perl -e 'exit $ARGV[0] !~ /^5\.[^.]+$/' "$NEO4J" ; then
+          NEO4J=5.25.1
+          echo "::NOTICE:: Resolved Neo4j '$ALIAS' to Neo4j '$NEO4J'."
+        fi
+        if [ "$NEO4J" != "$ALIAS" ] ; then
+          echo "Resolved Neo4j '$ALIAS' to Neo4j '$NEO4J'."
+        fi
+        echo "neo4j-version=$NEO4J" >> "$GITHUB_OUTPUT"
+      shell: bash
+      id: aliases
+
     - name: Install Neo4j 5
-      if: ${{ startsWith( inputs.neo4j-version , '5.') }}
+      if: ${{ startsWith( steps.aliases.outputs.neo4j-version , '5.') }}
       run: |
         NEO4J_DISTS="${{ inputs.neo4j-dist-url }}"
-        NEO4J="${{ inputs.neo4j-version }}"
+        NEO4J="${{ steps.aliases.outputs.neo4j-version }}"
         [ -e "neo4j-community-$NEO4J-unix.tar.gz" ] && CACHE_HIT=1
         [ -n "$CACHE_HIT" ] || curl -sLO https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.9%2B9/OpenJDK17U-jre_x64_linux_hotspot_17.0.9_9.tar.gz
         tar -xzf OpenJDK17U-jre_x64_linux_hotspot_17.0.9_9.tar.gz
@@ -43,10 +118,10 @@ runs:
       shell: bash
 
     - name: Install Neo4j 4
-      if: ${{ startsWith( inputs.neo4j-version , '4.') }}
+      if: ${{ startsWith( steps.aliases.outputs.neo4j-version , '4.') }}
       run: |
         NEO4J_DISTS="${{ inputs.neo4j-dist-url }}"
-        NEO4J="${{ inputs.neo4j-version }}"
+        NEO4J="${{ steps.aliases.outputs.neo4j-version }}"
         [ -e "neo4j-community-$NEO4J-unix.tar.gz" ] && CACHE_HIT=1
         [ -n "$CACHE_HIT" ] || curl -sLO https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.22%2B7/OpenJDK11U-jre_x64_linux_hotspot_11.0.22_7.tar.gz
         tar -xzf OpenJDK11U-jre_x64_linux_hotspot_11.0.22_7.tar.gz
@@ -63,10 +138,10 @@ runs:
       shell: bash
 
     - name: Install Neo4j 2/3
-      if: ${{ startsWith( inputs.neo4j-version , '3.') || startsWith( inputs.neo4j-version , '2.') || startsWith( inputs.neo4j-version , '1.') }}
+      if: ${{ startsWith( steps.aliases.outputs.neo4j-version , '3.') || startsWith( steps.aliases.outputs.neo4j-version , '2.') || startsWith( steps.aliases.outputs.neo4j-version , '1.') }}
       run: |
         NEO4J_DISTS="${{ inputs.neo4j-dist-url }}"
-        NEO4J="${{ inputs.neo4j-version }}"
+        NEO4J="${{ steps.aliases.outputs.neo4j-version }}"
         [ -e "neo4j-community-$NEO4J-unix.tar.gz" ] && CACHE_HIT=1
         [ -n "$CACHE_HIT" ] || curl -sLO https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_linux_hotspot_8u392b08.tar.gz
         tar -xzf OpenJDK8U-jre_x64_linux_hotspot_8u392b08.tar.gz

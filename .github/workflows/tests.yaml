@@ -17,23 +17,25 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - neo4j: "5.16.0"
-          - neo4j: "4.4.30"
-          - neo4j: "3.5.35"
-          - neo4j: "2.3.12"
+          - neo4j: 5
+          - neo4j: 4
+          - neo4j: 3
+          - neo4j: 2
     env:
       TEST_NEO4J_PASSWORD: xkcd_792
       NEO4J: ${{ matrix.neo4j }}
     steps:
       
       - name: Install Neo4j
-        uses: johannessen/actions-install-neo4j@main
+        id: install
+        uses: johannessen/actions-install-neo4j@v1
         with:
           neo4j-version: ${{ matrix.neo4j }}
           password: ${{ env.TEST_NEO4J_PASSWORD }}
       
       - name: Version info
         run: |
+          echo "Neo4j version '${{ steps.install.outputs.neo4j-version }}'"
           curl -s http://localhost:7474/ -u "neo4j:$TEST_NEO4J_PASSWORD" | grep neo4j_version || true
           curl -s http://localhost:7474/db/data/ -u "neo4j:$TEST_NEO4J_PASSWORD" | grep neo4j_version || true
           ls | grep --max-count=1 neo4j-community || true

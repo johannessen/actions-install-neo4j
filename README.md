@@ -47,6 +47,10 @@ jobs:
 * `neo4j-dist-url` – Base URL for downloading Neo4j distributions.
    Default: `https://dist.neo4j.org`
 
+The `neo4j-version` may be abbreviated. For example, given `4` or `4.4`, the
+action will *try* to resolve this to the latest known subversion of Neo4j 4.4.
+This feature is currently experimental.
+
 ## Directories
 
 Neo4j is installed in a directory named `neo4j-community-$VERSION`,
