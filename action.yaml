@@ -35,7 +35,7 @@ runs:
         eval "${JAVA_HOME:-/usr}/bin/java -version"
         [ -n "$CACHE_HIT" ] || curl -sLO $NEO4J_DISTS/neo4j-community-$NEO4J-unix.tar.gz
         tar -xzf neo4j-community-$NEO4J-unix.tar.gz
-        neo4j-community-$NEO4J/bin/neo4j-admin dbms set-initial-password "$TEST_NEO4J_PASSWORD" || echo "Password change using neo4j-admin failed."
+        neo4j-community-$NEO4J/bin/neo4j-admin dbms set-initial-password "${{ inputs.password }}" || echo "Password change using neo4j-admin failed."
         neo4j-community-$NEO4J/bin/neo4j start
         perl -E "print'Waiting for server to be ready ...';for(0..60){last if 0+\`grep Started neo4j-community-$NEO4J/logs/neo4j.log > /dev/null 2>&1 && echo 1 || echo 0\`;print'.';sleep 1}say' OK.'"
         cat neo4j-community-$NEO4J/logs/neo4j.log
@@ -55,7 +55,7 @@ runs:
         eval "${JAVA_HOME:-/usr}/bin/java -version"
         [ -n "$CACHE_HIT" ] || curl -sLO $NEO4J_DISTS/neo4j-community-$NEO4J-unix.tar.gz
         tar -xzf neo4j-community-$NEO4J-unix.tar.gz
-        neo4j-community-$NEO4J/bin/neo4j-admin set-initial-password "$TEST_NEO4J_PASSWORD" || echo "Password change using neo4j-admin failed."
+        neo4j-community-$NEO4J/bin/neo4j-admin set-initial-password "${{ inputs.password }}" || echo "Password change using neo4j-admin failed."
         neo4j-community-$NEO4J/bin/neo4j start
         perl -E "print'Waiting for server to be ready ...';for(0..60){last if 0+\`grep Started neo4j-community-$NEO4J/logs/neo4j.log > /dev/null 2>&1 && echo 1 || echo 0\`;print'.';sleep 1}say' OK.'"
         cat neo4j-community-$NEO4J/logs/neo4j.log
@@ -75,12 +75,12 @@ runs:
         eval "${JAVA_HOME:-/usr}/bin/java -version"
         [ -n "$CACHE_HIT" ] || curl -sLO $NEO4J_DISTS/neo4j-community-$NEO4J-unix.tar.gz
         tar -xzf neo4j-community-$NEO4J-unix.tar.gz
-        neo4j-community-$NEO4J/bin/neo4j-admin set-initial-password "$TEST_NEO4J_PASSWORD" || echo "Password change using neo4j-admin failed. (This is expected on Neo4j 2.)"
+        neo4j-community-$NEO4J/bin/neo4j-admin set-initial-password "${{ inputs.password }}" || echo "Password change using neo4j-admin failed. (This is expected on Neo4j 2.)"
         NEO4J_LOG=logs/neo4j.log
         if [ "$NEO4J" = "2.3.12" ] ; then neo4j-community-$NEO4J/bin/neo4j start-no-wait ; NEO4J_LOG=data/log/console.log ; else neo4j-community-$NEO4J/bin/neo4j start ; fi
         perl -E "print'Waiting for server to be ready ...';for(0..60){last if 0+\`grep 'Started\\\|interface ready' neo4j-community-$NEO4J/$NEO4J_LOG > /dev/null 2>&1 && echo 1 || echo 0\`;print'.';sleep 1}say' OK.'"
         sleep 1
-        curl -u neo4j:neo4j -fid "{\"password\":\"$TEST_NEO4J_PASSWORD\"}" -H "Content-Type:application/json" -s http://localhost:7474/user/neo4j/password || echo "Password change using cURL failed. (This is expected on Neo4j 3.)"
+        curl -u neo4j:neo4j -fid "{\"password\":\"${{ inputs.password }}\"}" -H "Content-Type:application/json" -s http://localhost:7474/user/neo4j/password || echo "Password change using cURL failed. (This is expected on Neo4j 3.)"
         cat neo4j-community-$NEO4J/$NEO4J_LOG
         neo4j-community-$NEO4J/bin/neo4j status
       shell: bash
