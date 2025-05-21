@@ -39,7 +39,7 @@ jobs:
           curl -s http://localhost:7474/ -u "neo4j:$TEST_NEO4J_PASSWORD" | grep neo4j_version || true
           curl -s http://localhost:7474/db/data/ -u "neo4j:$TEST_NEO4J_PASSWORD" | grep neo4j_version || true
           ls | grep --max-count=1 neo4j-community || true
-          basename "$(cat neo4j-javahome)"
+          cat neo4j-javahome
       
       - name: Install driver
         uses: shogo82148/actions-setup-perl@v1

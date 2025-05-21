@@ -1,8 +1,8 @@
 # Install Neo4j
 
 This GitHub action installs a fresh Neo4j server and a suitable Java
-runtime, sets the neo4j user password, and starts the server. Server
-and JRE are installed in subdirectories of the working directory.
+runtime, sets the neo4j user password, and starts the server.
+The server is installed in a subdirectory of the working directory.
 
 This action uses the Neo4j community edition, available from
 [https://neo4j.com/download-center/](https://neo4j.com/download-center/#community).
@@ -56,13 +56,9 @@ This feature is currently experimental.
 Neo4j is installed in a directory named `neo4j-community-$VERSION`,
 where VERSION is exactly the value of the `neo4j-version` input.
 
-Java is installed in one of the following directories, depending
-on the Neo4j version. The full path is written to a file named
-`neo4j-javahome`, for convenience.
-
-* `jdk8u392-b08-jre` for Neo4j 2/3
-* `jdk-11.0.22+7-jre` for Neo4j 4
-* `jdk-17.0.9+9-jre` for Neo4j 5
+Java is installed via the [setup-java](https://github.com/actions/setup-java)
+action, which uses the JVM pre-installed on the GH runner if available.
+The full path is written to a file named `neo4j-javahome`, for convenience.
 
 ## Limitations
 
