@@ -3,7 +3,7 @@ description: 'Install a fresh Neo4j server locally and start it'
 inputs:
   neo4j-version:
     description: 'Neo4j version to install'
-    default: '4.4'
+    default: '5.26'
   password:
     description: 'Neo4j password'
     required: true
@@ -56,7 +56,7 @@ runs:
           4.1   ) NEO4J=4.1.13  ;;
           4.2   ) NEO4J=4.2.19  ;;
           4.3   ) NEO4J=4.3.24  ;;
-          4.4   ) NEO4J=4.4.39  ;;
+          4.4   ) NEO4J=4.4.43  ;;
           5.0   ) NEO4J=5.1.0   ;;
           5.1   ) NEO4J=5.1.0   ;;
           5.2   ) NEO4J=5.2.0   ;;
@@ -78,11 +78,12 @@ runs:
           5.18  ) NEO4J=5.18.1  ;;
           5.19  ) NEO4J=5.19.0  ;;
           5.20  ) NEO4J=5.20.0  ;;
-          5.21  ) NEO4J=5.21.0  ;;
+          5.21  ) NEO4J=5.21.2  ;;
           5.22  ) NEO4J=5.22.0  ;;
           5.23  ) NEO4J=5.23.0  ;;
           5.24  ) NEO4J=5.24.2  ;;
           5.25  ) NEO4J=5.25.1  ;;
+          5.26  ) NEO4J=5.26.6  ;;
           *     ) NEO4J=$NEO4J  ;;
         esac
         if perl -e 'exit $ARGV[0] !~ /^5\.[^.]+$/' "$NEO4J" ; then

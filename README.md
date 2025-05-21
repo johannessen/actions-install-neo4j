@@ -54,7 +54,7 @@ This feature is currently experimental.
 ## Directories
 
 Neo4j is installed in a directory named `neo4j-community-$VERSION`,
-where VERSION is exactly the value of the `neo4j-version` input.
+where VERSION is exactly the value of the `neo4j-version` output.
 
 Java is installed via the [setup-java](https://github.com/actions/setup-java)
 action, which uses the JVM pre-installed on the GH runner if available.

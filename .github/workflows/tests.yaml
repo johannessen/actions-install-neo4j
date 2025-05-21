@@ -3,11 +3,7 @@ name: Tests
 on:
   workflow_dispatch:
   push:
-    branches:
-      - "*"
   pull_request:
-    branches:
-      - "*"
 
 jobs:
   test-job:
@@ -22,6 +18,7 @@ jobs:
           - neo4j: 3
           - neo4j: 2
     env:
+      CI: 1
       TEST_NEO4J_PASSWORD: xkcd_792
       NEO4J: ${{ matrix.neo4j }}
     steps:
@@ -36,7 +33,7 @@ jobs:
       - name: Version info
         run: |
           echo "Neo4j version '${{ steps.install.outputs.neo4j-version }}'"
-          curl -s http://localhost:7474/ -u "neo4j:$TEST_NEO4J_PASSWORD" | grep neo4j_version || true
+          curl -s http://localhost:7474/ -u "neo4j:$TEST_NEO4J_PASSWORD" | tr -s , "\n" | grep neo4j_version || true
           curl -s http://localhost:7474/db/data/ -u "neo4j:$TEST_NEO4J_PASSWORD" | grep neo4j_version || true
           ls | grep --max-count=1 neo4j-community || true
           cat neo4j-javahome
@@ -44,7 +41,7 @@ jobs:
       - name: Install driver
         uses: shogo82148/actions-setup-perl@v1
         with:
-          perl-version: 5.38
+          perl-version: '5.40'
           install-modules: Neo4j::Driver
       
       - name: Test Neo4j connection
