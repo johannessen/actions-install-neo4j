@@ -86,8 +86,8 @@ runs:
           5.26  ) NEO4J=5.26.6  ;;
           *     ) NEO4J=$NEO4J  ;;
         esac
-        if perl -e 'exit $ARGV[0] !~ /^5\.[^.]+$/' "$NEO4J" ; then
-          NEO4J=5.25.1
+        if perl -e 'exit $ARGV[0] !~ /^20[0-9]{2}\b/' "$NEO4J" ; then
+          NEO4J=2025.04.0
           echo "::NOTICE:: Resolved Neo4j '$ALIAS' to Neo4j '$NEO4J'."
         fi
         if [ "$NEO4J" != "$ALIAS" ] ; then
@@ -100,6 +100,7 @@ runs:
           [123]    ) JAVA=8   ;;
           4        ) JAVA=11  ;;
           5        ) JAVA=17  ;;
+          2025     ) JAVA=21  ;;
           *        ) JAVA=21  ;;
         esac
         echo "java-version=$JAVA" >> "$GITHUB_OUTPUT"
@@ -127,8 +128,8 @@ runs:
         echo "$JAVA_HOME" | tee neo4j-javahome
       shell: bash
 
-    - name: Start Neo4j 5
-      if: ${{ startsWith( steps.aliases.outputs.neo4j-version , '5.') }}
+    - name: Start Neo4j 5+
+      if: ${{ startsWith( steps.aliases.outputs.neo4j-version , '5.') || startsWith( steps.aliases.outputs.neo4j-version , '20') }}
       run: |
         NEO4J="${{ steps.aliases.outputs.neo4j-version }}"
         neo4j-community-$NEO4J/bin/neo4j-admin dbms set-initial-password "${{ inputs.password }}" || echo "Password change using neo4j-admin failed."

@@ -13,6 +13,7 @@ jobs:
       fail-fast: true
       matrix:
         include:
+          - neo4j: 2025
           - neo4j: 5
           - neo4j: 4
           - neo4j: 3
