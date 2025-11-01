@@ -7,8 +7,7 @@ The server is installed in a subdirectory of the working directory.
 This action uses the Neo4j community edition, available from
 <https://neo4j.com/deployment-center/>.
 
-Supported Neo4j versions are 2, 3, 4, and 5.
-Support for Neo4j 2025 is currently experimental.
+Supported Neo4j versions are 2, 3, 4, 5 and 2025.
 
 [![Tests](https://github.com/johannessen/actions-install-neo4j/actions/workflows/tests.yaml/badge.svg)](https://github.com/johannessen/actions-install-neo4j/actions/workflows/tests.yaml)
 

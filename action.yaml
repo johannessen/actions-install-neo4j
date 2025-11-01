@@ -28,17 +28,25 @@ runs:
     - name: Resolve Neo4j version
       run: |
         ALIAS=$( echo "${{ inputs.neo4j-version }}" | sed -e 's/^v//' )
+
         case "$ALIAS" in
           1  ) NEO4J=1.9     ;;
           2  ) NEO4J=2.3     ;;
           3  ) NEO4J=3.5     ;;
           4  ) NEO4J=4.4     ;;
           5  ) NEO4J=5.26    ;;
+          2025  ) NEO4J=2025.10  ;;
           *  ) NEO4J=$ALIAS  ;;
         esac
+        if perl -e 'exit $ARGV[0] !~ /^20[0-9]{2}$/' "$NEO4J" ; then
+          # The .01 subversion is likely to exist in an unknown future year.
+          NEO4J="$NEO4J.01"
+          echo "::NOTICE:: Resolved Neo4j '$ALIAS' to Neo4j '$NEO4J'."
+        fi
         if [ "$NEO4J" != "$ALIAS" ] ; then
           echo "Resolved Neo4j '$ALIAS' to Neo4j '$NEO4J'."
         fi
+
         ALIAS="$NEO4J"
         case "$ALIAS" in
           1.9   ) NEO4J=1.9.9   ;;
@@ -84,10 +92,22 @@ runs:
           5.24  ) NEO4J=5.24.2  ;;
           5.25  ) NEO4J=5.25.1  ;;
           5.26  ) NEO4J=5.26.14 ;;
+          2025.01  ) NEO4J=2025.01.0  ;;
+          2025.02  ) NEO4J=2025.02.0  ;;
+          2025.03  ) NEO4J=2025.03.0  ;;
+          2025.04  ) NEO4J=2025.04.0  ;;
+          2025.05  ) NEO4J=2025.05.1  ;;
+          2025.06  ) NEO4J=2025.06.2  ;;
+          2025.07  ) NEO4J=2025.07.1  ;;
+          2025.08  ) NEO4J=2025.08.0  ;;
+          2025.09  ) NEO4J=2025.09.0  ;;
+          2025.10  ) NEO4J=2025.10.1  ;;
           *     ) NEO4J=$NEO4J  ;;
         esac
-        if perl -e 'exit $ARGV[0] !~ /^20[0-9]{2}\b/' "$NEO4J" ; then
-          NEO4J=2025.04.0
+        if perl -e 'exit $ARGV[0] !~ /^20[0-9]{2}\.[01][0-9]$/' "$NEO4J" ; then
+          # Unfortunately, they sometimes skip the .0 patch. So some future
+          # versions will still need explicit entries in the case list above.
+          NEO4J="$NEO4J.0"
           echo "::NOTICE:: Resolved Neo4j '$ALIAS' to Neo4j '$NEO4J'."
         fi
         if [ "$NEO4J" != "$ALIAS" ] ; then
