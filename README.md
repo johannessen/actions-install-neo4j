@@ -40,8 +40,7 @@ jobs:
 
 ## Inputs
 
-* `neo4j-version` – The full Neo4j version designation as it appears in the
-   download URL, typically a string that looks like `2025.09.0`.
+* `neo4j-version` – The Neo4j version to be installed.
    An optional leading `v` will be ignored.
 * `password` – The password to set for the default `neo4j` user. Some Neo4j
    versions need a string with at least eight characters. Required.
@@ -49,9 +48,14 @@ jobs:
    Default: `https://dist.neo4j.org`
 
 The `neo4j-version` may be abbreviated. For example, given `5` or `5.26`,
-the action will *try* to resolve this to the latest known subversion of
-Neo4j 5.26.
-This feature is currently experimental.
+the action will try to resolve this to a subversion of Neo4j 5.26 that is
+known to exist. There is no guarantee it'll be the latest subversion.
+
+## Outputs
+
+* `neo4j-version` – The full Neo4j version designation of the software that
+   was actually downloaded and installed, typically a string that looks like
+   `2025.09.0` or `5.26.14`.
 
 ## Directories
 
@@ -63,5 +67,10 @@ action, which uses the JVM pre-installed on the GH runner if available.
 The full path is written to a file named `neo4j-javahome`, for convenience.
 
 ## Limitations
+
+Abbreviated version numbers should work even for Neo4j versions newer than
+this action, but that may not be perfectly reliable because future Neo4j
+version numbers aren't entirely predictable. If you need to test very recent
+Neo4j versions, consider specifying full version numbers to be safe.
 
 Running a server with disabled authentication is not currently implemented.
