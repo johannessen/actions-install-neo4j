@@ -27,7 +27,7 @@ runs:
 
     - name: Resolve Neo4j version
       run: |
-        ALIAS="${{ inputs.neo4j-version }}"
+        ALIAS=$( echo "${{ inputs.neo4j-version }}" | sed -e 's/^v//' )
         case "$ALIAS" in
           1  ) NEO4J=1.9     ;;
           2  ) NEO4J=2.3     ;;

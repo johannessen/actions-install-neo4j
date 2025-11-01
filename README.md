@@ -43,6 +43,7 @@ jobs:
 
 * `neo4j-version` – The full Neo4j version designation as it appears in the
    download URL, typically a string that looks like `2025.09.0`.
+   An optional leading `v` will be ignored.
 * `password` – The password to set for the default `neo4j` user. Some Neo4j
    versions need a string with at least eight characters. Required.
 * `neo4j-dist-url` – Base URL for downloading Neo4j distributions.
