@@ -5,7 +5,7 @@ runtime, sets the neo4j user password, and starts the server.
 The server is installed in a subdirectory of the working directory.
 
 This action uses the Neo4j community edition, available from
-[https://neo4j.com/download-center/](https://neo4j.com/download-center/#community).
+<https://neo4j.com/deployment-center/>.
 
 Supported Neo4j versions are 2, 3, 4, and 5.
 Support for Neo4j 2025 is currently experimental.
@@ -23,7 +23,7 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     env:
-      NEO4J: "4.4.23"
+      NEO4J: "5.26.14"
     steps:
 
       - name: Install Neo4j
@@ -42,14 +42,15 @@ jobs:
 ## Inputs
 
 * `neo4j-version` – The full Neo4j version designation as it appears in the
-   download URL, typically a string that looks like `5.9.0`.
+   download URL, typically a string that looks like `2025.09.0`.
 * `password` – The password to set for the default `neo4j` user. Some Neo4j
    versions need a string with at least eight characters. Required.
 * `neo4j-dist-url` – Base URL for downloading Neo4j distributions.
    Default: `https://dist.neo4j.org`
 
-The `neo4j-version` may be abbreviated. For example, given `4` or `4.4`, the
-action will *try* to resolve this to the latest known subversion of Neo4j 4.4.
+The `neo4j-version` may be abbreviated. For example, given `5` or `5.26`,
+the action will *try* to resolve this to the latest known subversion of
+Neo4j 5.26.
 This feature is currently experimental.
 
 ## Directories
